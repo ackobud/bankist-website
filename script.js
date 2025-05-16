@@ -1,12 +1,18 @@
 'use strict';
 
-///////////////////////////////////////
-// Modal window
-
 const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+const nav = document.querySelector('.nav');
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+///////////////////////////////////////
+// Modal window
 
 const openModal = function (e) {
   e.preventDefault();
@@ -30,9 +36,8 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-const btnScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
-
+//////////////////////////////////////////////////
+// Button scrolling
 btnScrollTo.addEventListener('click', function (e) {
   const s1coords = section1.getBoundingClientRect();
   console.log(s1coords);
@@ -47,60 +52,147 @@ btnScrollTo.addEventListener('click', function (e) {
     document.documentElement.clientWidth
   );
 
-  // Selecting elements
-  console.log(document.documentElement);
-  console.log(document.head);
-  console.log(document.body);
+  // Scrolling
+  // window.scrollTo(
+  //   s1coords.left + window.pageXOffset,
+  //   s1coords.top + window.pageYOffset
+  // );
 
-  const header = document.querySelector('.header');
-  const allSection = document.querySelectorAll('.section');
-  console.log(allSection);
+  // window.scrollTo({
+  //   left: s1coords.left + window.pageXOffset,
+  //   top: s1coords.top + window.pageYOffset,
+  //   behavior: 'smooth',
+  // });
 
-  document.getElementById('section--1');
-  const allButtons = document.getElementsByTagName('button');
-  console.log(allButtons);
+  section1.scrollIntoView({ behavior: 'smooth' });
+});
 
-  console.log(document.getElementsByClassName('btn'));
+//////////////////////////////////////////////////
+// Page navigation
 
-  // Creating and inserting elements
-  const message = document.createElement('div');
-  message.classList.add('cookie-message');
-  // message.textContent =
-  //   'We use cookies for improved functionality and analytics.';
-  message.innerHTML =
-    'We use cookies for improved functionality and analytics. <button class = "btn btn--close-cookie">Got it!</button>';
+// document.querySelectorAll('.nav__link').forEach(function (el) {
+//   el.addEventListener('click', function (e) {
+//     e.preventDefault();
+//     const id = this.getAttribute('href');
+//     console.log(id);
+//     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+//   });
+// });
 
-  // // header.prepend(message);
-  header.append(message);
-  // // header.append(message.cloneNode(true));
+// 1. Add event listener to common parent element
+// 2. Determine what element originated the event
 
-  // // header.before(message);
-  // header.after(message);
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  e.preventDefault();
 
-  // Delete elements
+  // Matching strategy
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href');
+    console.log(id);
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// Tabbed component
+
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab');
+
+  // Guard clause
+  if (!clicked) return;
+
+  // Remove active classes
+  tabs.forEach(t => t.classList.remove('operations__tab--active'));
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+
+  // Activate tab
+  clicked.classList.add('operations__tab--active');
+
+  // Activate content area
   document
-    .querySelector('.btn--close-cookie')
-    .addEventListener('click', function () {
-      // message.remove();
-      message.parentElement.removeChild(message);
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
+
+// Menu fade animation
+const handleHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = this;
     });
+    logo.style.opacity = this;
+  }
+};
 
-  // Styles
-  message.style.backgroundColor = '#37383d';
-  message.style.width = '120%';
+// Passing "argument" into handler
+nav.addEventListener('mouseover', handleHover.bind(0.5));
 
-  console.log(message.style.color);
-  console.log(message.style.backgroundColor);
+nav.addEventListener('mouseout', handleHover.bind(1));
 
-  console.log(getComputedStyle(message).color);
-  console.log(getComputedStyle(message).height);
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
-  message.style.height =
-    Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
+/*
+//////////////////////////////////////////////////
+// Selecting elements
+console.log(document.documentElement);
+console.log(document.head);
+console.log(document.body);
 
-  document.documentElement.style.setProperty('--color-primary', 'orangered');
+const header = document.querySelector('.header');
+const allSection = document.querySelectorAll('.section');
+console.log(allSection);
 
-  /*
+document.getElementById('section--1');
+const allButtons = document.getElementsByTagName('button');
+console.log(allButtons);
+
+console.log(document.getElementsByClassName('btn'));
+
+// Creating and inserting elements
+const message = document.createElement('div');
+message.classList.add('cookie-message');
+// message.textContent =
+//   'We use cookies for improved functionality and analytics.';
+message.innerHTML =
+  'We use cookies for improved functionality and analytics. <button class = "btn btn--close-cookie">Got it!</button>';
+
+// // header.prepend(message);
+header.append(message);
+// // header.append(message.cloneNode(true));
+
+// // header.before(message);
+// header.after(message);
+
+// Delete elements
+document
+  .querySelector('.btn--close-cookie')
+  .addEventListener('click', function () {
+    // message.remove();
+    message.parentElement.removeChild(message);
+  });
+
+// Styles
+message.style.backgroundColor = '#37383d';
+message.style.width = '120%';
+
+console.log(message.style.color);
+console.log(message.style.backgroundColor);
+
+console.log(getComputedStyle(message).color);
+console.log(getComputedStyle(message).height);
+
+message.style.height =
+  Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
+
+document.documentElement.style.setProperty('--color-primary', 'orangered');
+
+/*
 // Attributes
 const logo = document.querySelector('.nav__logo');
 console.log(logo.alt);
@@ -132,22 +224,7 @@ logo.classList.contains('c');
 // Don't use this
 logo.className = 'jonas';
 */
-
-  // Scrolling
-  // window.scrollTo(
-  //   s1coords.left + window.pageXOffset,
-  //   s1coords.top + window.pageYOffset
-  // );
-
-  // window.scrollTo({
-  //   left: s1coords.left + window.pageXOffset,
-  //   top: s1coords.top + window.pageYOffset,
-  //   behavior: 'smooth',
-  // });
-
-  section1.scrollIntoView({ behavior: 'smooth' });
-});
-
+/*
 const h1 = document.querySelector('h1');
 
 const alertH1 = function (e) {
@@ -189,9 +266,38 @@ document.querySelector('.nav').addEventListener(
   },
   true
 );
-
+*/
 /*
 git add .
 git commit -m "Describe your changes"
 git push
+*/
+/*
+const h1 = document.querySelector('h1');
+
+// Going downwards: child
+console.log(h1.querySelectorAll('.highlight'));
+console.log(h1.childNodes);
+console.log(h1.children);
+h1.firstElementChild.style.color = 'white';
+h1.lastElementChild.style.color = 'orangered';
+
+console.log(h1.parentNode);
+console.log(h1.parentElement);
+
+h1.closest('.header').style.background = 'var(--gradient-secondary)';
+
+h1.closest('h1').style.background = 'var(--gradient-primary)';
+
+// Going sideways: siblings
+console.log(h1.previousElementSibling);
+console.log(h1.nextElementSibling);
+
+console.log(h1.previousSibling);
+console.log(h1.nextSibling);
+
+console.log(h1.parentElement.children);
+[...h1.parentElement.children].forEach(function (el) {
+  if (el !== h1) el.style.transform = 'scale(0.5)';
+});
 */
